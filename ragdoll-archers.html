@@ -1,0 +1,218 @@
+<!-- Ultimate Game Stash file -->
+<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Ragdoll Archers</title>
+  <script src="https://cdn.jsdelivr.net/gh/laparda14/Ragdoll-archers@62504c9570ea720c6367e7debe1e110c68f77c2d/vs/gameloader-helper.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bubbls/ruffle@04dd5345a30d6ebf4b0e2cc385568750cd56ed5a/styyyle.css">
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top, rgba(77, 153, 255, 0.22), transparent 34%),
+        radial-gradient(circle at bottom, rgba(255, 150, 77, 0.18), transparent 30%),
+        #090d15;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    }
+
+    body {
+      position: relative;
+    }
+
+    canvas:focus {
+      outline: none;
+    }
+
+    #unity-container {
+      width: 100%;
+      height: 100%;
+    }
+
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #111827;
+    }
+
+    #loading-cover {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(7, 10, 18, 0.92);
+      z-index: 20;
+    }
+
+    #unity-loading-bar {
+      width: min(520px, calc(100% - 32px));
+      padding: 24px 22px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      background: rgba(10, 16, 28, 0.88);
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+    }
+
+    #unity-logo {
+      margin-bottom: 18px;
+      color: #f6f8ff;
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .progress-spinner-container {
+      display: grid;
+      grid-template-columns: 36px 1fr 36px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .spinner-left,
+    .spinner-right {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(255, 255, 255, 0.18);
+      border-top-color: #ffb84d;
+      border-radius: 999px;
+      animation: spin 0.9s linear infinite;
+    }
+
+    .spinner-right {
+      border-top-color: #71b6ff;
+      animation-direction: reverse;
+    }
+
+    #unity-progress-bar-empty {
+      display: none;
+      height: 16px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    #unity-progress-bar-full {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #ff9a3d, #ffd84d 48%, #7ecbff);
+      box-shadow: 0 0 20px rgba(126, 203, 255, 0.4);
+      transition: width 120ms linear;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 720px) {
+      #unity-loading-bar {
+        padding: 20px 16px;
+        border-radius: 16px;
+      }
+
+      .progress-spinner-container {
+        grid-template-columns: 28px 1fr 28px;
+        gap: 10px;
+      }
+
+      .spinner-left,
+      .spinner-right {
+        width: 28px;
+        height: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="unity-container" class="unity-desktop">
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+  </div>
+
+  <div id="loading-cover">
+    <div id="unity-loading-bar">
+      <div id="unity-logo">Ragdoll Archers</div>
+      <div class="progress-spinner-container">
+        <div class="spinner-left" aria-hidden="true"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+        <div class="spinner-right" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const loaderUrl = "https://cdn.jsdelivr.net/gh/bubbls/ruffle@7117cc5006472d782b65d96abd375597d6273242/v11121212.js";
+    const config = {
+      dataUrl: "https://cdn.jsdelivr.net/gh/bubbls/ruffle@04dd5345a30d6ebf4b0e2cc385568750cd56ed5a/6697b6deba8b617c67b69c55dcd07cb1.data.unityweb",
+      frameworkUrl: "https://cdn.jsdelivr.net/gh/bubbls/ruffle@04dd5345a30d6ebf4b0e2cc385568750cd56ed5a/0be3c3ee7115b26e1ae28e643afdf1f2.js.unityweb",
+      codeUrl: "https://cdn.jsdelivr.net/gh/bubbls/ruffle@04dd5345a30d6ebf4b0e2cc385568750cd56ed5a/b3397c29f6878557c1c614cbf9e196ea.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "Ericetto",
+      productName: "Ragdoll Archers",
+      productVersion: "0.1"
+    };
+
+    const container = document.getElementById("unity-container");
+    const canvas = document.getElementById("unity-canvas");
+    const loadingCover = document.getElementById("loading-cover");
+    const progressBarEmpty = document.getElementById("unity-progress-bar-empty");
+    const progressBarFull = document.getElementById("unity-progress-bar-full");
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      container.className = "unity-mobile";
+    }
+
+    loadingCover.style.display = "flex";
+
+    const unityLoader = document.createElement("script");
+    unityLoader.src = loaderUrl;
+    unityLoader.onload = () => {
+      createUnityInstance(canvas, config, (progress) => {
+        progressBarEmpty.style.display = "block";
+        progressBarFull.style.width = (100 * progress) + "%";
+      }).then((unityInstance) => {
+        window.unityInstance = unityInstance;
+        loadingCover.style.display = "none";
+      }).catch((message) => {
+        loadingCover.style.display = "none";
+        alert(message);
+      });
+    };
+    unityLoader.onerror = () => {
+      loadingCover.style.display = "none";
+      alert("Failed to load the Ragdoll Archers loader script.");
+    };
+    document.body.appendChild(unityLoader);
+
+    document.addEventListener("pointerdown", () => {
+      container.focus();
+      window.focus();
+      canvas.focus();
+    });
+
+    document.addEventListener("contextmenu", (event) => event.preventDefault());
+  </script>
+</body>
+</html>
